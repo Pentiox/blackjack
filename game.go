@@ -90,4 +90,27 @@ func (g *Game) resolveHands() {
 // resolveHand resolves the outcome of a single hand between the dealer and a player.
 func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand) {
 
+	if handPlayer.IsBusted() {
+		g.Statistics.BustsPlayer.Add(1)
+	}
+
+	if handDealer.IsBusted() {
+		g.Statistics.BustsDealer.Add(1)
+	}
+
+	if handDealer.IsGreater(handPlayer) || handDealer.IsEqual(handPlayer) {
+		g.resolveWinDealer(handDealer)
+	}
+
+	g.resolveWinPlayer(handPlayer)
+}
+
+// resolveWinDealer resolves the win for the dealer.
+func (g *Game) resolveWinDealer(hand *deck.Hand) {
+	g.Statistics.WinsDealer.Add(1)
+}
+
+// resolveWinPlayer resolves the win for a player.
+func (g *Game) resolveWinPlayer(hand *deck.Hand) {
+	g.Statistics.WinsPlayer.Add(1)
 }

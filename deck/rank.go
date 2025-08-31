@@ -1,6 +1,9 @@
 package deck
 
-import "math/rand"
+import (
+	"blackjack/config"
+	"math/rand"
+)
 
 // Rank is a blackjack card's rank.
 type Rank int64
@@ -66,3 +69,18 @@ var Deck = []Rank{
 func NewRank(rng *rand.Rand) Rank {
 	return Deck[rng.Intn(len(Deck))]
 }
+
+// BlackjackHandSize is the number of cards in a blackjack hand.
+//
+// The smallest possible hand for any bust limit is defined as the
+// bust limit divided by the value of the highest card.
+var BlackjackHandSizes = func() int {
+
+	size := config.BustLimit / 11
+
+	if config.BustLimit%11 != 0 {
+		size++
+	}
+
+	return size
+}()
