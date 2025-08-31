@@ -2,8 +2,6 @@
 Blackjack simulation for my engagement after party.
 
 ## TODO
-- Implement card resolution logic
-- Implement chip logic
-- Implement analytics
-- Benchmarking
+- Implement expected value analytics
+- Benchmarking and balancing
 - Make unnecessarilly exported resources un-exported
