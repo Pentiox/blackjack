@@ -12,7 +12,7 @@ const (
 	MaxHands int = 10000
 
 	// NumGames is the total number of blackjack games played.
-	NumGames int = 32
+	NumGames int = 1
 
 	// NumGamesParallel is the total number of blackjack games played in parallel.
 	NumGamesParallel int = 32
