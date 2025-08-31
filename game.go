@@ -179,17 +179,21 @@ func (g *Game) resolveWinDealer(hand *deck.Hand, playerIndex int) {
 // resolveWinPlayer resolves the win for a player.
 func (g *Game) resolveWinPlayer(hand *deck.Hand, playerIndex int) {
 
+	g.Players[playerIndex].Chips++
 	g.Statistics.WinsPlayer++
 
 	if hand.IsBlackjack() {
+		g.Players[playerIndex].Chips++
 		g.Statistics.BlackjacksPlayer++
 	}
 
 	if hand.IsEights() {
+		g.Players[playerIndex].Chips++
 		g.Statistics.EightsPlayer++
 	}
 
 	if hand.IsKingAndQueen() {
+		g.Players[playerIndex].Chips++
 		g.Statistics.KingAndQueensPlayer++
 	}
 }
