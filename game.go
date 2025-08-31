@@ -85,16 +85,24 @@ func (g *Game) resolveHands() {
 	for i := range config.PlayerHands {
 		for j := range g.Players {
 
+			if g.Players[j].IsBusted() {
+				continue
+			}
+
 			log.Printf("Dealer hand %s", g.Dealer.Hands[i].String())
 			log.Printf("Player %d hand %s", j, g.Players[j].Hands[i].String())
 
 			g.resolveHand(g.Dealer.Hands[i], g.Players[j].Hands[i], j)
 
 			log.Printf("Player %d hands resolved with %d chips left", j, g.Players[j].Chips)
+		}
+	}
 
-			if g.Players[j].IsBusted() {
-				g.Players = append(g.Players[:j], g.Players[j+1:]...)
-			}
+	// Remove busted players from the game.
+	for i := 0; i < len(g.Players); i++ {
+		if g.Players[i].IsBusted() {
+			g.Players = append(g.Players[:i], g.Players[i+1:]...)
+			i--
 		}
 	}
 }
