@@ -9,7 +9,7 @@ const (
 	BustLimit int = 25
 
 	// MaxHands is the maximum number of hands that can be played in a single game across all players.
-	MaxHands int64 = 10000
+	MaxHands int = 10000
 
 	// NumGames is the total number of blackjack games played.
 	NumGames int = 32

@@ -32,7 +32,7 @@ func NewGame() *Game {
 // The game is over when all players are busted.
 func (g *Game) isOver() bool {
 
-	if g.Statistics.TotalHands.Load() <= config.MaxHands {
+	if g.Statistics.TotalHands <= config.MaxHands {
 		return false
 	}
 
@@ -91,11 +91,11 @@ func (g *Game) resolveHands() {
 func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand) {
 
 	if handPlayer.IsBusted() {
-		g.Statistics.BustsPlayer.Add(1)
+		g.Statistics.BustsPlayer++
 	}
 
 	if handDealer.IsBusted() {
-		g.Statistics.BustsDealer.Add(1)
+		g.Statistics.BustsDealer++
 	}
 
 	if handDealer.IsGreater(handPlayer) || handDealer.IsEqual(handPlayer) {
@@ -107,10 +107,10 @@ func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand) {
 
 // resolveWinDealer resolves the win for the dealer.
 func (g *Game) resolveWinDealer(hand *deck.Hand) {
-	g.Statistics.WinsDealer.Add(1)
+	g.Statistics.WinsDealer++
 }
 
 // resolveWinPlayer resolves the win for a player.
 func (g *Game) resolveWinPlayer(hand *deck.Hand) {
-	g.Statistics.WinsPlayer.Add(1)
+	g.Statistics.WinsPlayer++
 }
