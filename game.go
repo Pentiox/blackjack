@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"math/rand"
 	"time"
 
@@ -32,15 +33,15 @@ func NewGame() *Game {
 // The game is over when all players are busted.
 func (g *Game) isOver() bool {
 
-	if g.Statistics.TotalHands <= config.MaxHands {
-		return false
+	if g.Statistics.TotalHands > config.MaxHands {
+		return true
 	}
 
-	if !g.Players.IsBusted() {
-		return false
+	if len(g.Players) == 0 {
+		return true
 	}
 
-	return true
+	return false
 }
 
 // Play runs the blackjack game loop.
@@ -59,15 +60,17 @@ func (g *Game) Play() *Statistics {
 // dealCards deals cards to all players and the dealer.
 func (g *Game) dealCards() {
 
-	for _, player := range g.Players {
-		g.dealCardsToPlayer(player)
+	for i, player := range g.Players {
+		g.dealCardsToPlayer(player, i)
 	}
 
-	g.dealCardsToPlayer(g.Dealer)
+	g.dealCardsToPlayer(g.Dealer, len(g.Players))
 }
 
 // dealCardsToPlayer deals cards to a single player.
-func (g *Game) dealCardsToPlayer(player *Player) {
+func (g *Game) dealCardsToPlayer(player *Player, playerIndex int) {
+
+	g.seed += int64(playerIndex)
 
 	// Generate a new random number generator for the player.
 	rng := rand.New(rand.NewSource(g.seed))
@@ -82,7 +85,12 @@ func (g *Game) resolveHands() {
 	for i := range config.PlayerHands {
 		for j := range g.Players {
 
+			log.Printf("Dealer hand %s", g.Dealer.Hands[i].String())
+			log.Printf("Player %d hand %s", j, g.Players[j].Hands[i].String())
+
 			g.resolveHand(g.Dealer.Hands[i], g.Players[j].Hands[i], j)
+
+			log.Printf("Player %d hands resolved with %d chips left", j, g.Players[j].Chips)
 
 			if g.Players[j].IsBusted() {
 				g.Players = append(g.Players[:j], g.Players[j+1:]...)
@@ -97,10 +105,16 @@ func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand, playerIndex int) {
 	g.Statistics.TotalHands++
 
 	if handPlayer.IsBusted() {
+		g.Players[playerIndex].Chips--
 		g.Statistics.BustsPlayer++
 	}
 
+	if g.Players[playerIndex].IsBusted() {
+		return
+	}
+
 	if handDealer.IsBusted() {
+		g.Players[playerIndex].Chips++
 		g.Statistics.BustsDealer++
 	}
 
@@ -112,7 +126,16 @@ func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand, playerIndex int) {
 		g.resolveWinPlayer(handPlayer, playerIndex)
 	}
 
+	if g.Players[playerIndex].IsBusted() {
+		return
+	}
+
 	g.resolveJokersDealer(handDealer, playerIndex)
+
+	if g.Players[playerIndex].IsBusted() {
+		return
+	}
+
 	g.resolveJokersPlayer(handPlayer, playerIndex)
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"sync"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 
@@ -10,6 +11,12 @@ import (
 )
 
 func main() {
+
+	// Start a timer to measure how long each game takes.
+	start := time.Now()
+	defer func() {
+		log.Printf("Simulating all games took %s", time.Since(start))
+	}()
 
 	// Statistics is the overall statistics over all blackjack games.
 	//
@@ -20,9 +27,11 @@ func main() {
 	group := errgroup.Group{}
 	group.SetLimit(config.NumGamesParallel)
 
-	for range config.NumGames {
+	for i := range config.NumGames {
 
 		group.Go(func() error {
+
+			log.Printf("Game %d started at %s", i, time.Since(start))
 
 			game := NewGame()
 
@@ -31,6 +40,8 @@ func main() {
 			statisticsMu.Lock()
 			statistics.Add(result)
 			statisticsMu.Unlock()
+
+			log.Printf("Game %d took %s", i, time.Since(start))
 
 			return nil
 		})

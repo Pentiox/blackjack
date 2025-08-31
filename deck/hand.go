@@ -2,7 +2,9 @@ package deck
 
 import (
 	"blackjack/config"
+	"fmt"
 	"math/rand"
+	"strings"
 )
 
 // Hand is a blackjack player's hand.
@@ -131,6 +133,18 @@ func (h *Hand) IsKingAndQueen() bool {
 	}
 
 	return hasKing && hasQueen
+}
+
+// String returns a string representation of the hand.
+func (h *Hand) String() string {
+
+	var cards []string
+
+	for _, card := range h.Cards {
+		cards = append(cards, card.String())
+	}
+
+	return fmt.Sprintf("[%s]", strings.Join(cards, ", "))
 }
 
 // Hands is a list of blackjack hands.
