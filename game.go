@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 
+	"blackjack/config"
 	"blackjack/deck"
 )
 
@@ -31,10 +32,12 @@ func NewGame() *Game {
 // The game is over when all players are busted.
 func (g *Game) isOver() bool {
 
-	for _, player := range g.Players {
-		if !player.IsBusted() {
-			return false
-		}
+	if g.Statistics.TotalHands.Load() <= config.MaxHands {
+		return false
+	}
+
+	if !g.Players.IsBusted() {
+		return false
 	}
 
 	return true
@@ -46,6 +49,8 @@ func (g *Game) Play() *Statistics {
 	for !g.isOver() {
 
 		g.dealCards()
+
+		g.resolveHands()
 	}
 
 	return g.Statistics
@@ -55,12 +60,34 @@ func (g *Game) Play() *Statistics {
 func (g *Game) dealCards() {
 
 	for _, player := range g.Players {
-
 		g.dealCardsToPlayer(player)
 	}
+
+	g.dealCardsToPlayer(g.Dealer)
 }
 
+// dealCardsToPlayer deals cards to a single player.
 func (g *Game) dealCardsToPlayer(player *Player) {
 
-	player.Hands = deck.NewHands(rand.New(rand.NewSource(g.seed)))
+	// Generate a new random number generator for the player.
+	rng := rand.New(rand.NewSource(g.seed))
+
+	// Create new hands for the player.
+	player.Hands = deck.NewHands(rng)
+}
+
+// resolveHands resolves the hands for all players and the dealer.
+func (g *Game) resolveHands() {
+
+	for i := range config.PlayerHands {
+		for j := range g.Players {
+			g.resolveHand(g.Dealer.Hands[i], g.Players[j].Hands[i])
+		}
+	}
+
+}
+
+// resolveHand resolves the outcome of a single hand between the dealer and a player.
+func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand) {
+
 }

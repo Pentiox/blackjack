@@ -39,3 +39,15 @@ func NewPlayers() Players {
 
 	return players
 }
+
+// IsBusted checks if all players are busted (out of chips).
+func (p Players) IsBusted() bool {
+
+	for _, player := range p {
+		if !player.IsBusted() {
+			return false
+		}
+	}
+
+	return true
+}
