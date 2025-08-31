@@ -8,6 +8,9 @@ const (
 	// This is typically set to 21 in standard blackjack.
 	BustLimit int = 25
 
+	// MaxHands is the maximum number of hands that can be played in a single game across all players.
+	MaxHands int64 = 10000
+
 	// NumGames is the total number of blackjack games played.
 	NumGames int = 32
 
@@ -20,9 +23,9 @@ const (
 	// PlayerStartingChips is the number of chips each player starts with.
 	PlayerStartingChips int = 100
 
-	// PlayerStandLimit is the minimum value a player must reach to stand.
-	PlayerStandLimit int = 19
-
 	// PlayersPerGame is the number of players aside from the dealer in a given game.
 	PlayersPerGame int = 1
+
+	// StandLimit is the minimum value a player must reach to stand.
+	StandLimit int = 19
 )
