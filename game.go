@@ -3,6 +3,8 @@ package main
 import (
 	"math/rand"
 	"time"
+
+	"blackjack/deck"
 )
 
 // Game is the state of a blackjack game.
@@ -60,5 +62,5 @@ func (g *Game) dealCards() {
 
 func (g *Game) dealCardsToPlayer(player *Player) {
 
-	player.Hands = NewHands(rand.New(rand.NewSource(g.seed)))
+	player.Hands = deck.NewHands(rand.New(rand.NewSource(g.seed)))
 }

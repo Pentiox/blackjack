@@ -1,18 +1,22 @@
 package main
 
-import "blackjack/config"
+import (
+	"blackjack/config"
+	"blackjack/deck"
+)
 
 // Player is a blackjack player.
+
 type Player struct {
 	Chips int
-	Hands []*Hand
+	Hands []*deck.Hand
 }
 
 // NewPlayer creates a new blackjack player.
 func NewPlayer() *Player {
 	return &Player{
 		Chips: config.PlayerStartingChips,
-		Hands: []*Hand{},
+		Hands: []*deck.Hand{},
 	}
 }
 
