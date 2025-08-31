@@ -21,11 +21,3 @@ func NewCard(rng *rand.Rand) *Card {
 
 	return card
 }
-
-// Cards is a list of blackjack cards.
-type Cards []*Card
-
-// NewCards creates a new list of blackjack cards.
-func NewCards(rng *rand.Rand) Cards {
-	return make(Cards, 0)
-}
