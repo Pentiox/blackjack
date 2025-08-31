@@ -81,14 +81,18 @@ func (g *Game) resolveHands() {
 
 	for i := range config.PlayerHands {
 		for j := range g.Players {
-			g.resolveHand(g.Dealer.Hands[i], g.Players[j].Hands[i])
+
+			g.resolveHand(g.Dealer.Hands[i], g.Players[j].Hands[i], j)
+
+			if g.Players[j].IsBusted() {
+				g.Players = append(g.Players[:j], g.Players[j+1:]...)
+			}
 		}
 	}
-
 }
 
 // resolveHand resolves the outcome of a single hand between the dealer and a player.
-func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand) {
+func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand, playerIndex int) {
 
 	if handPlayer.IsBusted() {
 		g.Statistics.BustsPlayer++
@@ -98,19 +102,94 @@ func (g *Game) resolveHand(handDealer, handPlayer *deck.Hand) {
 		g.Statistics.BustsDealer++
 	}
 
-	if handDealer.IsGreater(handPlayer) || handDealer.IsEqual(handPlayer) {
-		g.resolveWinDealer(handDealer)
+	if handDealer.IsGreater(handPlayer) {
+		g.resolveWinDealer(handDealer, playerIndex)
+	} else if handDealer.IsEqual(handPlayer) {
+		g.resolvePush(handDealer, playerIndex)
+	} else {
+		g.resolveWinPlayer(handPlayer, playerIndex)
 	}
 
-	g.resolveWinPlayer(handPlayer)
+	g.resolveJokersDealer(handDealer, playerIndex)
+	g.resolveJokersPlayer(handPlayer, playerIndex)
+}
+
+// resolveJokersDealer resolves the jokers for the dealer.
+func (g *Game) resolveJokersDealer(hand *deck.Hand, playerIndex int) {
+
+	for _, card := range hand.Cards {
+
+		if card.Rank != deck.RankJoker {
+			continue
+		}
+
+		// Track the number of jokers for the dealer.
+		if playerIndex == 0 {
+			g.Statistics.JokersDealer++
+		}
+
+		g.Players[playerIndex].Chips--
+	}
+}
+
+// resolveJokersPlayer resolves the jokers for a player.
+func (g *Game) resolveJokersPlayer(hand *deck.Hand, playerIndex int) {
+
+	for _, card := range hand.Cards {
+
+		if card.Rank != deck.RankJoker {
+			continue
+		}
+
+		g.Statistics.JokersPlayer++
+		g.Players[playerIndex].Chips--
+	}
+}
+
+// resolvePush resolves the push for a player.
+//
+// This assumes the dealer wins the hand.
+func (g *Game) resolvePush(hand *deck.Hand, playerIndex int) {
+	g.Statistics.TotalPushes++
+	g.resolveWinDealer(hand, playerIndex)
 }
 
 // resolveWinDealer resolves the win for the dealer.
-func (g *Game) resolveWinDealer(hand *deck.Hand) {
+func (g *Game) resolveWinDealer(hand *deck.Hand, playerIndex int) {
+
+	g.Players[playerIndex].Chips--
 	g.Statistics.WinsDealer++
+
+	if hand.IsBlackjack() {
+		g.Players[playerIndex].Chips--
+		g.Statistics.BlackjacksDealer++
+	}
+
+	if hand.IsEights() {
+		g.Players[playerIndex].Chips--
+		g.Statistics.EightsDealer++
+	}
+
+	if hand.IsKingAndQueen() {
+		g.Players[playerIndex].Chips--
+		g.Statistics.KingAndQueensDealer++
+	}
 }
 
 // resolveWinPlayer resolves the win for a player.
-func (g *Game) resolveWinPlayer(hand *deck.Hand) {
+func (g *Game) resolveWinPlayer(hand *deck.Hand, playerIndex int) {
+
 	g.Statistics.WinsPlayer++
+
+	if hand.IsBlackjack() {
+		g.Statistics.BlackjacksPlayer++
+	}
+
+	if hand.IsEights() {
+		g.Statistics.EightsPlayer++
+	}
+
+	if hand.IsKingAndQueen() {
+		g.Statistics.KingAndQueensPlayer++
+	}
 }
